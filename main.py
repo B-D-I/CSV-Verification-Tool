@@ -9,6 +9,7 @@ app = typer.Typer()
 
 
 def get_file(combined_date, user, passwd):
+    # ftp = return_ftp_host(host)
     get_batch_ids()
     if ftp_login_check(user, passwd):
         ftp.cwd('/ftp/')
@@ -29,9 +30,12 @@ def get_file(combined_date, user, passwd):
 def ftp_credentials(menu_type):
     username = input('Enter FTP username: ')
     password = input('Enter FTP password: ')
+    # host = input('Enter FTP host: ')
     if menu_type == 'interactive':
         interactive_download(username, password)
     elif menu_type == 'scheduler':
+        # set_schedule_creds(username, password, host)
+        # scheduler()
         pass
 
 
@@ -39,8 +43,8 @@ def interactive_download(username, password):
     year = input('Enter year of CSV (YYYY): ')
     month = input('Enter month of CSV (MM): ')
     day = input('Enter day of CSV (DD): ')
-    date = year + month + day
-    get_file(date, username, password)
+    combined_date = year + month + day
+    get_file(combined_date, username, password)
 
 
 def show_validation():
@@ -59,6 +63,28 @@ def archive_file():
     src_path = f'file_downloads/{csv_file}'
     dest_path = 'file_validated'
     shutil.move(src_path, dest_path)
+
+def set_schedule_creds(username, password, host):
+    # this stores credentials in txt to be retrieved during auto download
+    f = open('creds.txt', 'w')
+    f.write(username + '\n')
+    f.write(password + '\n')
+    f.write(host + '\n')
+    f.close()
+
+
+def get_schedule_creds(cred_type):
+    f = open('creds.txt', 'r')
+    username = f.readline().rstrip()
+    passw = f.readline().rstrip()
+    host = f.readline().rstrip()
+    if cred_type == 'username':
+        cred = username
+    elif cred_type == 'password':
+        cred = passw
+    elif cred_type == 'host':
+        cred = host
+    return cred
 
 
 def scheduler(username, password):
@@ -98,6 +124,9 @@ def start():
 
 @app.command()
 def auto_download():
+    # ftp_name = get_schedule_creds('username')
+    # ftp_passw = get_schedule_creds('password')
+    # ftp_host = get_schedule_creds('host')
     today = str(date.today())
     today = today.replace('-', '')
     get_file(today, ftp_username, ftp_password)
